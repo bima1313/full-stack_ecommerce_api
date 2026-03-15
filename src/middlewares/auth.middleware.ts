@@ -32,3 +32,14 @@ export const verifyToken = (
     res.status(403).json({ message: "Token is invalid or expired." });
   }
 };
+
+// Role-Based Access Control (RBAC)
+export const authorizeRole = (roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      res.status(403).json({ message: "Access denied" });
+      return;
+    }
+    next();
+  };
+};

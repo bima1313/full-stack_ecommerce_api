@@ -1,12 +1,8 @@
-import {
-  Router,
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import { Router } from "express";
+import { allProductController } from "../../controllers/product.controller.ts";
+import { authorizeRole } from "../../middlewares/auth.middleware.ts";
+import { Role } from "@prisma/client";
 
 export const ProductRouter: Router = Router();
 
-ProductRouter.get("/", (req: Request, res: Response, next: NextFunction) => {
-  return res.status(200);
-});
+ProductRouter.get("/", authorizeRole([Role.ADMIN]), allProductController);

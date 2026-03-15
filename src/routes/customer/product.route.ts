@@ -1,12 +1,6 @@
-import {
-  Router,
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import { Router } from "express";
+import { availableProductsController } from "../../controllers/product.controller.ts";
 
 export const ProductRouter: Router = Router();
 
-ProductRouter.get("/", (req: Request, res: Response, next: NextFunction) => {
-  return res.status(200);
-});
+ProductRouter.get("/", availableProductsController);
