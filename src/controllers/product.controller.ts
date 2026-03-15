@@ -31,9 +31,22 @@ export const availableProductsController = async (
   next: NextFunction,
 ) => {
   try {
-    const requestCategory = req.params;
-    const allProducts: Product[] = await prisma.product.findMany({
-      where: { stock: { gt: 0 }, category: requestCategory || undefined },
+    const { category } = req.query;
+    const allProducts = await prisma.product.findMany({
+      where: category
+        ? {
+            stock: { gt: 0 },
+            category: {
+              name: category as string,
+            },
+          }
+        : { stock: { gt: 0 } },
+      omit: {
+        stock: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
     });
     return res.status(200).json({ data: allProducts });
   } catch (error) {
