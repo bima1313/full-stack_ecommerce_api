@@ -27,3 +27,6 @@ export const productSchema = z
   .strict();
 
 export type productSchema = z.infer<typeof productSchema>;
+
+export const patchProductSchema = productSchema.partial();
+export type patchProductSchema = z.infer<typeof patchProductSchema>;
