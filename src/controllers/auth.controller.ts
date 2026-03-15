@@ -13,7 +13,7 @@ export const loginController = async (
 ) => {
   try {    
     const data: LoginSchema = req.body;
-    const user = await prisma.user.findFirst({ where: { email: data.email } });
+    const user = await prisma.user.findUnique({ where: { email: data.email } });
     if (!user) {
       return res.status(401).send({ message: "Email and Password was wrong" });
     } else {

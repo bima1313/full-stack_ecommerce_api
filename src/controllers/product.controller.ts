@@ -105,7 +105,7 @@ export const getProductController = async (
 ) => {
   try {
     const { productId } = req.params;
-    const product = await prisma.product.findFirst({
+    const product = await prisma.product.findUnique({
       where: { id: productId as string },
     });
     if (!product) {
