@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import type { LoginSchema } from "../shema/loginSchema.ts";
 import type { RegisterSchema } from "../shema/registerSchema.ts";
 import { comparePassword, hashPassword } from "../utils/bcryptPass.ts";
+import { prisma } from "../utils/prisma.ts";
 
 export const loginController = async (
   req: Request,
@@ -13,16 +14,15 @@ export const loginController = async (
   try {
     const MAX_ATTEMPTS = 5;
     const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
-    const prisma = new PrismaClient();
     const data: LoginSchema = req.body;
     const user = await prisma.user.findFirst({ where: { email: data.email } });
     if (!user) {
       return res.status(401).send({ message: "Email and Password was wrong" });
     } else {
-      if (user.lockUntil && user.lockUntil > new Date()) {
+      if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
         const remainingTime = Math.ceil(
           (user.lockUntil.getTime() - Date.now()) / 60000,
-        );
+        );        
         return res.status(403).json({
           message: `Please try again in ${remainingTime} minutes.`,
         });
@@ -99,7 +99,6 @@ export const registerController = async (
   next: NextFunction,
 ) => {
   try {
-    const prisma = new PrismaClient();
     const data: RegisterSchema = req.body;
     const email: string = data.email;
     const name: string = data.name;

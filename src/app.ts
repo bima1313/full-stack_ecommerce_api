@@ -11,6 +11,8 @@ const app: Application = express();
 app.use(cors());
 app.use(express.json());
 
+// standarization time zone
+process.env.TZ = 'UTC';
 // main app
 app.use("/api", registerRoutes);
 
