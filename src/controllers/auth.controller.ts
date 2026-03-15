@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import type { LoginSchema } from "../shema/loginSchema.ts";
