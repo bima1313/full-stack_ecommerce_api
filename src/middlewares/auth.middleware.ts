@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { configuration } from "../config/config.ts";
 
 export interface AuthRequest extends Request {
   user?: {
@@ -22,7 +23,7 @@ export const verifyToken = (
       res.status(401).json({ message: "Access denied. Token not found" });
       return;
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    const decoded = jwt.verify(token, configuration.jwt.secret) as {
       userId: string;
       role: string;
     };

@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { configuration } from "../config/config.ts";
 
 // Handler only status 404
 export const notFoundHandler = (
@@ -25,6 +26,6 @@ export const errorMiddleware = (
     success: false,
     status: statusCode,
     message: message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    stack: configuration.environment === "development" ? err.stack : undefined,
   });
 };

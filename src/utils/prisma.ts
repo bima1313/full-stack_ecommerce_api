@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { configuration } from '../config/config.ts';
 
 // Save instance Prisma as object global
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -7,6 +8,6 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 export const prisma = globalForPrisma.prisma || new PrismaClient();
 
 // if environment is not production, save that instance to global
-if (process.env.NODE_ENV !== 'production') {
+if (configuration.environment !== 'production') {
   globalForPrisma.prisma = prisma;
 }

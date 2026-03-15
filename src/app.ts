@@ -5,6 +5,7 @@ import {
   errorMiddleware,
   notFoundHandler,
 } from "./middlewares/error.midleware.ts";
+import { configuration } from "./config/config.ts";
 
 const app: Application = express();
 
@@ -12,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // standarization time zone
-process.env.TZ = 'UTC';
+configuration.timezone;
 // main app
 app.use("/api", registerRoutes);
 
@@ -21,7 +22,7 @@ app.use(notFoundHandler);
 // ERROR MIDDLEWARE
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT || 3000;
+const PORT = configuration.port;
 
 app.listen(PORT, () => {
   console.log(`Server E-Commerce berjalan di http://localhost:${PORT}`);

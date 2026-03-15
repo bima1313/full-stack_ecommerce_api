@@ -4,15 +4,14 @@ import type { LoginSchema } from "../shema/loginSchema.ts";
 import type { RegisterSchema } from "../shema/registerSchema.ts";
 import { comparePassword, hashPassword } from "../utils/bcryptPass.ts";
 import { prisma } from "../utils/prisma.ts";
+import { configuration } from "../config/config.ts";
 
 export const loginController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const MAX_ATTEMPTS = 5;
-    const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
+  try {    
     const data: LoginSchema = req.body;
     const user = await prisma.user.findFirst({ where: { email: data.email } });
     if (!user) {
@@ -23,7 +22,7 @@ export const loginController = async (
           (user.lockUntil.getTime() - Date.now()) / 60000,
         );        
         return res.status(403).json({
-          message: `Please try again in ${remainingTime} minutes.`,
+          message: `Please try again in ${remainingTime} minutes.`,          
         });
       }
 
@@ -35,8 +34,8 @@ export const loginController = async (
         const newAttempts = user.loginAttempts + 1;
         let lockUntil = null;
 
-        if (newAttempts >= MAX_ATTEMPTS) {
-          lockUntil = new Date(Date.now() + LOCK_TIME);
+        if (newAttempts >= configuration.maxAttempts) {
+          lockUntil = new Date(Date.now() + configuration.lockTime);
         }
 
         await prisma.user.update({
@@ -57,22 +56,22 @@ export const loginController = async (
       };
       const generateAccessToken = jwt.sign(
         payload,
-        process.env.JWT_SECRET as string,
+        configuration.jwt.secret,
         {
-          expiresIn: "15m",
+          expiresIn: configuration.jwt.accessExpired,
         },
       );
       const generateRefreshToken = jwt.sign(
         payload,
-        process.env.JWT_SECRET as string,
+        configuration.jwt.secret,
         {
-          expiresIn: "7d",
+          expiresIn: configuration.jwt.refreshExpired,
         },
       );
       await prisma.user.update({
         where: { id: user.id },
         data: {
-          refreshToken: generateAccessToken,
+          refreshToken: generateRefreshToken,
           loginAttempts: 0,
           lockUntil: null,
         },
