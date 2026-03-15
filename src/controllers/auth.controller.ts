@@ -11,14 +11,42 @@ export const loginController = async (
   next: NextFunction,
 ) => {
   try {
+    const MAX_ATTEMPTS = 5;
+    const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
     const prisma = new PrismaClient();
     const data: LoginSchema = req.body;
     const user = await prisma.user.findFirst({ where: { email: data.email } });
     if (!user) {
       return res.status(401).send({ message: "Email and Password was wrong" });
     } else {
-      const isPasswordValid = await comparePassword(data.password, user.password);
+      if (user.lockUntil && user.lockUntil > new Date()) {
+        const remainingTime = Math.ceil(
+          (user.lockUntil.getTime() - Date.now()) / 60000,
+        );
+        return res.status(403).json({
+          message: `Please try again in ${remainingTime} minutes.`,
+        });
+      }
+
+      const isPasswordValid = await comparePassword(
+        data.password,
+        user.password,
+      );
       if (!isPasswordValid) {
+        const newAttempts = user.loginAttempts + 1;
+        let lockUntil = null;
+
+        if (newAttempts >= MAX_ATTEMPTS) {
+          lockUntil = new Date(Date.now() + LOCK_TIME);
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            loginAttempts: newAttempts,
+            lockUntil: lockUntil,
+          },
+        });
         return res
           .status(401)
           .send({ message: "Email and Password was wrong" });
@@ -44,7 +72,11 @@ export const loginController = async (
       );
       await prisma.user.update({
         where: { id: user.id },
-        data: { refreshToken: generateAccessToken },
+        data: {
+          refreshToken: generateAccessToken,
+          loginAttempts: 0,
+          lockUntil: null,
+        },
       });
       return res.status(200).json({
         data: [

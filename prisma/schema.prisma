@@ -23,6 +23,8 @@ model User {
   role         Role      @default(CUSTOMER)
   refreshToken String?
   orders       Order[]
+  loginAttempts Int       @default(0)
+  lockUntil     DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   deletedAt    DateTime?
