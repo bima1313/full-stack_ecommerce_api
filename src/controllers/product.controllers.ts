@@ -21,7 +21,7 @@ export const getProductsController = async (
           }
         : {},
     });
-    return res.status(200).json({ data: allProducts });
+    return res.status(200).json({ message: "success", data: allProducts });
   } catch (error) {
     next(error);
   }
@@ -50,7 +50,7 @@ export const availableProductsController = async (
         deletedAt: true,
       },
     });
-    return res.status(200).json({ data: allProducts });
+    return res.status(200).json({ message: "success", data: allProducts });
   } catch (error) {
     next(error);
   }
@@ -111,7 +111,7 @@ export const getProductController = async (
     if (!product) {
       return res.status(404).json({ message: "Product is not found" });
     }
-    return res.status(200).json({ params: productId, data: product });
+    return res.status(200).json({ message: "success", data: product });
   } catch (error) {
     next(error);
   }

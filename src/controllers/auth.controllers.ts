@@ -11,18 +11,18 @@ export const loginController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {    
+  try {
     const data: LoginSchema = req.body;
     const user = await prisma.user.findUnique({ where: { email: data.email } });
     if (!user) {
-      return res.status(401).send({ message: "Email and Password was wrong" });
+      return res.status(401).json({ message: "Email and Password was wrong" });
     } else {
       if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
         const remainingTime = Math.ceil(
           (user.lockUntil.getTime() - Date.now()) / 60000,
-        );        
+        );
         return res.status(403).json({
-          message: `Please try again in ${remainingTime} minutes.`,          
+          message: `Please try again in ${remainingTime} minutes.`,
         });
       }
 
@@ -47,27 +47,19 @@ export const loginController = async (
         });
         return res
           .status(401)
-          .send({ message: "Email and Password was wrong" });
+          .json({ message: "Email and Password was wrong" });
       }
       const payload = {
         id: user.id,
         name: user.name,
         role: user.role,
       };
-      const generateAccessToken = jwt.sign(
-        payload,
-        configuration.jwt.secret,
-        {
-          expiresIn: configuration.jwt.accessExpired,
-        },
-      );
-      const generateRefreshToken = jwt.sign(
-        payload,
-        configuration.jwt.secret,
-        {
-          expiresIn: configuration.jwt.refreshExpired,
-        },
-      );
+      const generateAccessToken = jwt.sign(payload, configuration.jwt.secret, {
+        expiresIn: configuration.jwt.accessExpired,
+      });
+      const generateRefreshToken = jwt.sign(payload, configuration.jwt.secret, {
+        expiresIn: configuration.jwt.refreshExpired,
+      });
       await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -77,9 +69,9 @@ export const loginController = async (
         },
       });
       return res.status(200).json({
+        message: "success",
         data: [
           {
-            message: "success",
             access_token: generateAccessToken,
             refresh_token: generateRefreshToken,
           },
@@ -109,11 +101,7 @@ export const registerController = async (
       },
     });
     return res.status(201).json({
-      data: [
-        {
-          message: "success",
-        },
-      ],
+      message: "Register success",
     });
   } catch (error) {
     next(error);
