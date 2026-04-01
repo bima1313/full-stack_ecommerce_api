@@ -2,16 +2,9 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { configuration } from "../config/config.js";
 
-export interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    role: string;
-  };
-}
-
 // JWT Token Verification
 export const verifyToken = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -24,7 +17,7 @@ export const verifyToken = (
       return;
     }
     const decoded = jwt.verify(token, configuration.jwt.secret) as {
-      userId: string;
+      id: string;
       role: string;
     };
     req.user = decoded;
@@ -36,7 +29,7 @@ export const verifyToken = (
 
 // Role-Based Access Control (RBAC)
 export const authorizeRole = (roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user || !roles.includes(req.user.role)) {
       res.status(403).json({ message: "Access denied" });
       return;
