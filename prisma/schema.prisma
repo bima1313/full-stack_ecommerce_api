@@ -16,18 +16,19 @@ datasource db {
 
 // User Model
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  name          String
-  password      String
-  role          Role      @default(CUSTOMER)
-  refreshToken  String?   @map("refresh_token")
-  orders        Order[]
-  loginAttempts Int       @default(0) @map("login_attempts")
-  lockUntil     DateTime? @map("lock_until")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id              String            @id @default(uuid())
+  email           String            @unique
+  name            String
+  password        String
+  role            Role              @default(CUSTOMER)
+  refreshToken    String?           @map("refresh_token")
+  orders          Order[]
+  shippingAddress ShippingAddress[]
+  loginAttempts   Int               @default(0) @map("login_attempts")
+  lockUntil       DateTime?         @map("lock_until")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
 
   @@map("user")
 }
@@ -84,6 +85,24 @@ model OrderItem {
   price     Int
 
   @@map("order_item")
+}
+
+// ShippingAddress Model
+model ShippingAddress {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receiverName String    @map("receiver_name")
+  phoneNumber  String    @map("phone_number")
+  address      String
+  province     String
+  city         String
+  postalCode   String    @map("postal_code")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  @@map("shipping_address")
 }
 
 enum Role {
