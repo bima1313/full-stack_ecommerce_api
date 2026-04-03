@@ -4,9 +4,12 @@ import {
   type Request,
   type Response,
 } from "express";
+import { createOrderController, ordersController } from "../../controllers/order.controllers.js";
+import { validate } from "../../middlewares/validate.middlewares.js";
+import { orderSchema } from "../../shema/orderSchema.js";
 
 export const OrderRoute: Router = Router();
 
-OrderRoute.get("/", (req: Request, res: Response, next: NextFunction) => {
-  return res.status(200);
-});
+OrderRoute.get("/", ordersController);
+
+OrderRoute.post("/create", validate(orderSchema), createOrderController);
