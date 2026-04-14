@@ -56,10 +56,10 @@ RefreshRoute.get(
           },
         });
       } else {
-        res.status(403).json({ message: "Token is invalid or expired." });
+        res.status(401).json({ message: "Token is invalid or expired." });
       }
     } catch (error) {
-      res.status(403).json({ message: "Token is invalid or expired." });
+      res.status(401).json({ message: "Token is invalid or expired." });
     }
   },
 );
