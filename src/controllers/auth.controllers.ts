@@ -73,12 +73,10 @@ export const loginController = catchAsync(
       });
       return res.status(200).json({
         message: "success",
-        data: [
-          {
-            access_token: generateAccessToken,
-            refresh_token: generateRefreshToken,
-          },
-        ],
+        data: {
+          access_token: generateAccessToken,
+          refresh_token: generateRefreshToken,
+        },
       });
     }
   },
